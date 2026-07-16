@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
-from database import init_db, insert_candidate, fetch_candidates
-from resume_processor import quick_sort, greedy_select, compute_centrality
-from skill_extractor import extract_text_from_pdf, extract_skills_from_text
+from backend.database import init_db, insert_candidate, fetch_candidates
+from backend.resume_processor import quick_sort, greedy_select, compute_centrality
+from backend.skill_extractor import extract_text_from_pdf, extract_skills_from_text
 
 app = Flask(
     __name__,
@@ -10,7 +10,12 @@ app = Flask(
     static_folder="../frontend/static"
 )
 
-app.config["UPLOAD_FOLDER"] = "../resumes"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 hr_prompt = ""
@@ -110,4 +115,4 @@ def search():
 # 🚀 Run Flask App
 # =========================================================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
