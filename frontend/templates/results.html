@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filtered Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Filtered Candidate Results</h1>
+        <p>Showing candidates based on your search or filter selection.</p>
+    </header>
+
+    <div class="container">
+
+        {% if candidates %}
+            <div class="candidate-cards-container">
+                {% for c in candidates %}
+                <div class="candidate-card">
+                    <h4>{{ c.name }}</h4>
+                    <p class="skills"><strong>Skills:</strong> {{ c.skills }}</p>
+                    <p><strong>Experience:</strong> {{ c.experience }} years</p>
+                    <span class="badge review">Score: {{ c.score }}%</span>
+                    <a href="{{ url_for('view_resume', filename=c.name) }}" target="_blank" class="view-btn">View Resume</a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No candidates found.</p>
+        {% endif %}
+
+        <br>
+        <a href="/" class="back-btn">⬅ Back to Home</a>
+    </div>
+</body>
+</html>

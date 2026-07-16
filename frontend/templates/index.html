@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Screening System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>AI Resume Screening System</h1>
+        <p>Smart resume analysis, automated scoring, and ranking powered by algorithms.</p>
+    </header>
+
+    <div class="container">
+        <!-- Job Req & Upload -->
+        <div class="top-section">
+            <div class="card">
+                <h3>Job Requirements</h3>
+                <form action="/set_prompt" method="post">
+                    <textarea name="prompt" placeholder="Enter job description, required skills..."></textarea>
+                    <button type="submit">Set Job Requirements</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Resume Upload</h3>
+                <form action="/upload_resume" method="post" enctype="multipart/form-data">
+                    <input type="file" name="resume" required>
+                    <button type="submit">Upload Resume</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <h2>{{ stats.total }}</h2>
+                <p>Total Candidates</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ stats.shortlisted }}</h2>
+                <p>Shortlisted</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ stats.average }}</h2>
+                <p>Average Score</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ stats.highest }}</h2>
+                <p>Top Score</p>
+            </div>
+        </div>
+
+        <!-- Candidate Rankings -->
+        <div class="candidate-list">
+            <h3>Candidate Rankings</h3>
+            {% if candidates %}
+                <!-- Filter buttons -->
+                <div class="filter-buttons">
+                    <a href="{{ url_for('search', query='', filter='top5') }}" class="filter-btn">Top 5</a>
+                    <a href="{{ url_for('search', query='', filter='last5') }}" class="filter-btn">Last 5</a>
+                    <a href="{{ url_for('search', query='', filter='shortlisted_top') }}" class="filter-btn">Shortlisted Top</a>
+                    <a href="{{ url_for('search', query='', filter='all') }}" class="filter-btn">All</a>
+                </div>
+
+                <div class="candidate-cards-container">
+                    {% for c in candidates %}
+                        {% if hr_prompt %}
+                            {% set is_shortlisted = hr_prompt.lower() in c.skills.lower() %}
+                        {% else %}
+                            {% set is_shortlisted = False %}
+                        {% endif %}
+
+                        <div class="candidate-card {% if is_shortlisted %}shortlisted-card{% endif %}">
+                            <h4>{{ c.name }}</h4>
+                            <p><strong>Skills:</strong> {{ c.skills }}</p>
+                            <p><strong>Experience:</strong> {{ c.experience }} years</p>
+
+                            {% if hr_prompt %}
+                                {% if is_shortlisted %}
+                                    <span class="badge shortlisted">Shortlisted</span>
+                                {% else %}
+                                    <span class="badge review">Under Review</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge review">Under Review</span>
+                            {% endif %}
+
+                            <a href="{{ url_for('view_resume', filename=c.name) }}" target="_blank" class="view-btn">View Resume</a>
+                            <div class="score">{{ c.score }}%</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No candidates uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
